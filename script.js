@@ -1,7 +1,8 @@
-function rotate(a) {
-    let x = Math.cos(a);
-    let y = Math.sin(a);
-    return [x, y]
+function rotate_x(a) {
+    return Math.sin(a)
+}
+function rotate_y(a) {
+    return -Math.cos(a)
 }
 
 window.addEventListener("load", (event) => {
@@ -11,8 +12,10 @@ window.addEventListener("load", (event) => {
     var Player1 = {
         x: 0.0,
         y: 0.0,
-        a: 0,
-        screena: 0
+        a: 0.0,
+        screena: 0.0,
+        v: 200,
+        d: -1,
     };
     
     var canvas = document.querySelector("canvas#render");
@@ -23,6 +26,8 @@ window.addEventListener("load", (event) => {
     var start = undefined;
     var ctx = null;
     var images = [false];
+    var deltatime = 0;
+    var start;
     function image_pointer(n) {
         return (event) => {
             console.log(`image ${n} has been loaded`)
@@ -51,62 +56,56 @@ window.addEventListener("load", (event) => {
     windowResizeEvent();
 
     function loading(timeStamp) {
-        if (start === undefined) {
-            start = timeStamp;
-        }
-        time = timeStamp - start;
-        ctx.clearRect(0, 0, width, height);
-
         if (images.every(Boolean)) {
-            start = undefined;
-            frameCount = 0;
-            init();
             clock();
         } else {
             requestAnimationFrame(loading);
-            ++frameCount;
         }
-    }
-
-    function init() {
-        ctx.save();
     }
 
     function clock(timeStamp) {
         if (start === undefined) {
             start = timeStamp;
         }
-        time = timeStamp - start;
+        if (timeStamp != undefined) {
+        console.log("timeStamp " + timeStamp);
+        let ntime = (timeStamp - start) / 1000;
+        console.log("hey " + ntime);
+        deltatime = ntime - time;
+        time = ntime;
         ctx.clearRect(0, 0, width, height);
+        console.log(deltatime);
+        console.log(time);
 
-        
-        Player1.a += 0.01;
-        let vel = rotate(Player1.a);
-        Player1.x += vel[0];
-        Player1.y += vel[1];
+        Player1.a += Player1.d * deltatime;
+        Player1.x += rotate_x(Player1.a) * Player1.v * deltatime;
+        Player1.y += rotate_y(Player1.a) * Player1.v * deltatime;
 
         Player1.x = (Player1.x + 10240.0) % 20480 - 10240.0;
         Player1.y = (Player1.y + 10240.0) % 20480 - 10240.0;
         console.log(Player1);
         draw();
         
+        }
         requestAnimationFrame(clock);
         ++frameCount;
     }
 
     function draw() {
         ctx.save();
-        ctx.rotate(-Player1.a);
-        ctx.translate(Player1.x, Player1.y);
         ctx.translate(width / 2, height / 2);
+        ctx.save();
+        ctx.translate(-Player1.x, -Player1.y);
+        ctx.rotate(Player1.a);
         const bg_pattern = ctx.createPattern(bg_tile, "repeat");
-        
         ctx.fillStyle = bg_pattern;
         ctx.fillRect(-100000, -100000, 200000, 200000);
         ctx.fillStyle = "rgb(0, 0, 200)";
         ctx.fillRect(-20, -20, 40, 40);
+        ctx.restore();
         ctx.fillStyle = "rgb(200, 0, 200)";
-        ctx.fillRect(Player1.x - 20, Player1.y - 20, 40, 40);
+        ctx.fillRect(-20, -20, 40, 40);
+
         ctx.restore();
 
         ctx.font = "16px monospace";
@@ -116,6 +115,10 @@ window.addEventListener("load", (event) => {
         ctx.fillStyle = "#ffffff";
         ctx.fillText(Math.round(time / 10) / 100, 10, 10+16+16);
     }
+    document.body.addEventListener("keyup", () => {
+        Player1.d = -Player1.d
+    });
 
-    clock();
+    loading();
 });
+
