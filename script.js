@@ -31,8 +31,7 @@ window.addEventListener("load", (event) => { // ne commencer le programme que lo
         sa: 0.0,                // angle de l'écran
         v: 300,                 // vitesse du joueur
         av: 1,                  // vitesse de rotation du joueur
-        kright: 0,              // status de la touche "->" du clavier
-        kleft: 0,               // status de la touche "<-" du clavier
+        k: 0,                   // indique si le joueur a tourné durant cette frame
         e: 0.10,                // facteur de smooth sur la caméra
         last: [0,0],            // position de la frame précédente
         trace: [[[0,0], [0,0]]],// données du tracé
@@ -129,11 +128,11 @@ window.addEventListener("load", (event) => { // ne commencer le programme que lo
             
             
 
-            Player1.a += (Player1.kleft + Player1.kright) * Player1.av * deltatime;
+            // Player1.a += (Player1.kleft + Player1.kright) * Player1.av * deltatime;
             Player1.sa = ease(Player1.sa, Player1.a, Player1.e);
             Player1.x += rotate_x(Player1.a) * Player1.v * deltatime;
             Player1.y += rotate_y(Player1.a) * Player1.v * deltatime;
-            if (Player1.kleft + Player1.kright === 0) {
+            if (Player1.k === 0) {
                 Player1.trace[0].pop()
             }
             Player1.trace[0].push([Player1.x, Player1.y]);
@@ -142,7 +141,9 @@ window.addEventListener("load", (event) => { // ne commencer le programme que lo
             if (frameCount > 1) {
                 map_bitmap = mapctx.getImageData(0, 0, width, height);
 
-                let hitX = Math.round(width*0.5) + Math.round(Player1.a - Player1.sa) * 100;
+                // let hitX = Math.round(width*0.5) + Math.round((Player1.a - Player1.sa) * 100);
+                let hitX = Math.round(width*0.5);
+                // let hitY = Math.round(height*0.7) - 10;
                 let hitY = Math.round(height*0.7) - 10;
                 let hitR = map_bitmap.data[hitY * map_bitmap.width * 4 + hitX * 4 + 0];
                 let hitG = map_bitmap.data[hitY * map_bitmap.width * 4 + hitX * 4 + 1];
@@ -276,14 +277,16 @@ window.addEventListener("load", (event) => { // ne commencer le programme que lo
         ctx.fillText(Math.round((Player1.a-Player1.sa) * 100) / 100, 200, 10+16+16+16);
         ctx.restore();
     }
-    document.body.addEventListener("keyup", (event) => {
-        if (event.code === "ArrowLeft") {Player1.kleft = 0}
-        else if (event.code === "ArrowRight") {Player1.kright = 0}
-    });
+
+    // document.body.addEventListener("keyup", (event) => {
+    //     if (event.code === "ArrowLeft") {Player1.kleft = 0}
+    //     else if (event.code === "ArrowRight") {Player1.kright = 0}
+    // });
+
     document.body.addEventListener("keydown", (event) => {
         // console.log(event);
-        if (event.code === "ArrowLeft") {Player1.kleft = -1}
-        else if (event.code === "ArrowRight") {Player1.kright = 1}
+        if (event.code === "ArrowLeft") {Player1.a -= 0.5; Player1.k = 1}
+        else if (event.code === "ArrowRight") {Player1.a += 0.5; Player1.k = 1}
         else if (event.code === "Space") {if (pause === 0) {pause = 1;} else {pause = 0; start = undefined; next_frame();}}
     });
 
