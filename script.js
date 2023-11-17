@@ -150,7 +150,7 @@ window.addEventListener("load", (event) => { // ne commencer le programme que lo
                 let hitA = map_bitmap.data[hitY * map_bitmap.width * 4 + hitX * 4 + 3];
                 console.log([hitR, hitG, hitB, hitA]);
                 if (hitB > 10) {
-                    Player1.color = "#f00";
+                    Player1.color = "#555";
                 }
             }
 
