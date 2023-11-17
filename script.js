@@ -142,7 +142,7 @@ window.addEventListener("load", (event) => { // ne commencer le programme que lo
             if (frameCount > 1) {
                 map_bitmap = mapctx.getImageData(0, 0, width, height);
 
-                let hitX = Math.round(width*0.5) + Math.round(Player1.a - Player1.sa) * 100;
+                let hitX = Math.round(width*0.5) + Math.round(Player1.a - Player1.sa) * 80;
                 let hitY = Math.round(height*0.7) - 10;
                 let hitR = map_bitmap.data[hitY * map_bitmap.width * 4 + hitX * 4 + 0];
                 let hitG = map_bitmap.data[hitY * map_bitmap.width * 4 + hitX * 4 + 1];
