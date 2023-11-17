@@ -20,43 +20,43 @@ function ease(number, target, fact, limit=0.002) {
 }
 
 
-window.addEventListener("load", (event) => {
+window.addEventListener("load", (event) => { // ne commencer le programme que lorseque tout sera loadé
     
     console.log("has been called");
 
-    var Player1 = {
-        x: 0.0,
-        y: 0.0,
-        a: 0.0,
-        sx: 0.0,
-        sy: 0.0,
-        sa: 0.0,
-        v: 300,
-        av: 1,
-        kright: 0,
-        kleft: 0,
-        e: 0.10,
-        last: [0,0],
-        trace: [[[0,0], [0,0]]],
-        color: "#f0f"
+    var Player1 = {  // objet joueur1, contient les attributs de joueur 1 
+        x: 0.0,                 // position X
+        y: 0.0,                 // position Y
+        a: 0.0,                 // angle
+        sa: 0.0,                // angle de l'écran
+        v: 300,                 // vitesse du joueur
+        av: 1,                  // vitesse de rotation du joueur
+        kright: 0,              // status de la touche "->" du clavier
+        kleft: 0,               // status de la touche "<-" du clavier
+        e: 0.10,                // facteur de smooth sur la caméra
+        last: [0,0],            // position de la frame précédente
+        trace: [[[0,0], [0,0]]],// données du tracé
+        color: "#f0f"           // couleure du joueur
     };
-    
+    // hauteur, largeur du rendu
     var width = 1600;
     var height = 900;
-    var mapsize = 1280;
-    var canvas = document.querySelector("canvas#render");
-    var mapcanvas = new OffscreenCanvas(width, height);
+
+    var mapsize = 1280; // distance entre le centre et le coté de la map
+    var canvas = document.querySelector("canvas#render"); // canvas de rendu principal
+    var mapcanvas = new OffscreenCanvas(width, height);   // canvas de rendu pour les tracés
     var frameCount = 0;
     var time = 0;
-    var start = undefined;
-    var images = [false];
-    var deltatime = 0;
+    var deltatime;
     var start;
-    var first = true;
     var map_bitmap;
     var pause = 0;
 
-    function image_pointer(n) {
+    // permet de s'assurer que les images sont loadées
+    var images = [];
+    function image_validator() {
+        let n = images.length;
+        images.push(false);
         return (event) => {
             console.log(`image ${n} has been loaded`);
             images[n] = true;
@@ -64,16 +64,16 @@ window.addEventListener("load", (event) => {
     }
 
     const bg_tile = new Image(100, 200);
-    bg_tile.onload = image_pointer(0);
+    bg_tile.onload = image_validator();
     bg_tile.src = "bg_tile.png";
 
+
+    // initialise les contextes de dessins pour canvas
     var ctx = null;
     var mapctx = null;
     if (canvas.getContext) {
         ctx = canvas.getContext("2d");
-        mapctx = mapcanvas.getContext("2d", {
-            willReadFrequently: true
-        });
+        mapctx = mapcanvas.getContext("2d", {willReadFrequently: true});
     } else {
         alert("Canvas Graphics are not supported");
     }
@@ -189,23 +189,16 @@ window.addEventListener("load", (event) => {
         mapctx.translate(width*0.5, height*0.7)
         mapctx.rotate(-Player1.sa * Math.PI);
         mapctx.translate(-Player1.x, -Player1.y)
-        mapctx.fillStyle = "#fff";
-        mapctx.fillRect(-mapsize - 8, -mapsize - 8, mapsize * 2 + 16, mapsize * 2 + 16);
+        
         mapctx.fillStyle = "#000";
         mapctx.fillRect(-mapsize, -mapsize, mapsize*2, mapsize*2);
-        mapctx.lineWidth = 16;
-        mapctx.lineCap = "round";
-        mapctx.lineJoin = "round";
-        mapctx.strokeStyle = Player1.color;
-        for (i = 0; i < Player1.trace.length; i++) {
-            mapctx.beginPath();
-            for (j = 0; j < Player1.trace[i].length; j++) {
-                mapctx.lineTo(Player1.trace[i][j][0], Player1.trace[i][j][1]);
-            }
-            mapctx.stroke();
-        }
         mapctx.strokeStyle = "#fff";
         mapctx.lineWidth = 8;
+        mapctx.strokeRect(-mapsize, -mapsize, mapsize * 2, mapsize * 2);
+        mapctx.lineWidth = 12;
+        mapctx.lineCap = "round";
+        mapctx.lineJoin = "round";
+        mapctx.strokeStyle = "#fff";
         for (i = 0; i < Player1.trace.length; i++) {
             mapctx.beginPath();
             for (j = 0; j < Player1.trace[i].length; j++) {
@@ -213,6 +206,28 @@ window.addEventListener("load", (event) => {
             }
             mapctx.stroke();
         }
+        mapctx.save();
+        mapctx.translate(Player1.x, Player1.y)
+        mapctx.scale(1.03, 1.03)
+        mapctx.translate(-Player1.x, -Player1.y)
+        mapctx.strokeStyle = Player1.color;
+        mapctx.lineWidth = 12;
+        for (i = 0; i < Player1.trace.length; i++) {
+            mapctx.beginPath();
+            for (j = 0; j < Player1.trace[i].length; j++) {
+                mapctx.lineTo(Player1.trace[i][j][0], Player1.trace[i][j][1]);
+            }
+            mapctx.stroke();
+        }
+        mapctx.restore();
+        mapctx.save();
+        mapctx.translate(Player1.x, Player1.y)
+        mapctx.scale(1.05, 1.05)
+        mapctx.translate(-Player1.x, -Player1.y)
+        mapctx.strokeStyle = "#fff";
+        mapctx.lineWidth = 8;
+        mapctx.strokeRect(-mapsize, -mapsize, mapsize * 2, mapsize * 2);
+        mapctx.restore();
         mapctx.restore();
         
 
