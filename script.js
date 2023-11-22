@@ -1,5 +1,5 @@
 
-// quelques fonctions utiles pour fair des calculs
+// quelques fonctions utiles pour fair des calculs (faire* gro ogr)
 
 function rotate_x(a) {
     return Math.sin(a * Math.PI)
