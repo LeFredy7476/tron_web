@@ -18,7 +18,7 @@ function ease(number, target, fact, limit=0.002) {
         return number + (target - number) * fact;
     }
 }
-//kjsagtfjheg
+
 
 window.addEventListener("load", (event) => { // ne commencer le programme que lorseque tout sera loadé
     
